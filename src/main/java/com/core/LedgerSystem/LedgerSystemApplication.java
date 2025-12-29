@@ -105,9 +105,6 @@ public class LedgerSystemApplication {
         System.out.println();
     }
 
-    // Create append-only Ledger records
-    // Debit and Credit Function
-    // Account Balance calculation
 
     public static void main(String[] args) {
         LedgerSystemApplication ledgerSystem = new LedgerSystemApplication();

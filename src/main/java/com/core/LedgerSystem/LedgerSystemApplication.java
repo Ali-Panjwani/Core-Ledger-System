@@ -27,32 +27,61 @@ public class LedgerSystemApplication {
     String accountNumber;
     AccountStatus accountStatus;
 
-
     public enum AccountStatus {
         ACTIVE,
         SUSPENDED,
         CLOSED
     }
 
-    public void setIdDetails(String systemId, String idType, String idValue){
+    // Ledger Details
+    static long[] ledgerAmounts = new long[100];
+    static boolean[] ledgerIsDebit = new boolean[100];
+    static int ledgerSize = 0;
+
+    public static long getBalance() {
+        long balance = 0;
+
+        for(int i = 0; i < ledgerSize; i++) {
+            balance += !ledgerIsDebit[i] ? ledgerAmounts[i] : -ledgerAmounts[i];
+        }
+
+        return balance;
+    }
+
+    public static void credit(long amount) {
+        ledgerAmounts[ledgerSize] = amount;
+        ledgerIsDebit[ledgerSize] = false;
+        ledgerSize++;
+    }
+
+    public static void debit(long amount) {
+        if (getBalance() < amount){
+            throw new IllegalStateException("Insufficient Balance");
+        }
+        ledgerAmounts[ledgerSize] = amount;
+        ledgerIsDebit[ledgerSize] = true;
+        ledgerSize++;
+    }
+
+    public void setIdDetails(String systemId, String idType, String idValue) {
         this.systemId = systemId;
         this.idType = idType;
         this.idValue = idValue;
     }
 
-    public void setCustomerDetails(String firstName, String lastName, String DOB){
+    public void setCustomerDetails(String firstName, String lastName, String DOB) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.DOB = DOB;
     }
 
-    public void setAccountDetails(String IBAN, String accountNumber, AccountStatus accountStatus){
+    public void setAccountDetails(String IBAN, String accountNumber, AccountStatus accountStatus) {
         this.IBAN = IBAN;
         this.accountNumber = accountNumber;
         this.accountStatus = accountStatus;
     }
 
-    public void printIdDetails(){
+    public void printIdDetails() {
         System.out.println("Identification Details:");
         System.out.println("System ID: " + systemId);
         System.out.println("ID Type: " + idType);
@@ -60,7 +89,7 @@ public class LedgerSystemApplication {
         System.out.println();
     }
     
-    public void printCustomerDetails(){
+    public void printCustomerDetails() {
         System.out.println("Customer Details:");
         System.out.println("First Name: " + firstName);
         System.out.println("Last Name: " + lastName);
@@ -68,13 +97,17 @@ public class LedgerSystemApplication {
         System.out.println();
     }
     
-    public void printAccountDetails(){
+    public void printAccountDetails() {
         System.out.println("Account Details:");
         System.out.println("IBAN: " + IBAN);
         System.out.println("Account Number: " + accountNumber);
         System.out.println("Account Status: " + accountStatus);
         System.out.println();
     }
+
+    // Create append-only Ledger records
+    // Debit and Credit Function
+    // Account Balance calculation
 
     public static void main(String[] args) {
         LedgerSystemApplication ledgerSystem = new LedgerSystemApplication();
@@ -83,12 +116,16 @@ public class LedgerSystemApplication {
         ledgerSystem.setCustomerDetails("Ali", "Panjwani", "18/05/2001");
         ledgerSystem.setAccountDetails("PK123456789", "56789", AccountStatus.ACTIVE);
 
+        credit(1000);
+        debit(250);
+
         System.out.println("Printing Customer Details");
         ledgerSystem.printIdDetails();
         System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
         ledgerSystem.printCustomerDetails();
         System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
         ledgerSystem.printAccountDetails();
+        System.out.println("Account Balance: " + getBalance());
         System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 
     }
